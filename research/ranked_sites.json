@@ -1,0 +1,330 @@
+[
+  {
+    "title": "Movy",
+    "url": "https://www.movy.sx/",
+    "mirrors": [],
+    "star": "Gold",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 125,
+    "raw": "* 🌟 **[Movy](https://www.movy.sx/)** - Movies / TV / Anime / 4K / Auto-Next"
+  },
+  {
+    "title": "Rive",
+    "url": "https://www.rivestream.app/",
+    "mirrors": [
+      "https://rivestream.ru/",
+      "https://rivestream.pw/",
+      "https://corsflix.net",
+      "https://watch.corsflix.dpdns.org"
+    ],
+    "star": "Gold",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 125,
+    "raw": "* 🌟 **[Rive](https://www.rivestream.app/)**, [2](https://rivestream.ru/), [3](https://rivestream.pw/) or [CorsFlix](https://watch.corsflix.net), [2](https://corsflix.net), [3](https://watch.corsflix.dpdns.org) - Movies / TV / Anime / Auto-Next / 4K / [Status](https://rentry.co/rivestream) / [Discord](https://discord.gg/6xJmJja8fV)"
+  },
+  {
+    "title": "67Movies",
+    "url": "https://67movies.st/",
+    "mirrors": [],
+    "star": "Gold",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 125,
+    "raw": "* 🌟 **[67Movies](https://67movies.st/)** or [PhantomFlix](https://phantomflix.net/) - Movies / TV / Anime / Auto-Next / 4K"
+  },
+  {
+    "title": "Stellar",
+    "url": "https://stellar.gdn/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Stellar](https://stellar.gdn/)** - Movies / TV / Anime / Auto-Next / 4K / [Discord](https://discord.gg/wncJByPPDU)"
+  },
+  {
+    "title": "Way2Movies",
+    "url": "https://beta.way2movies.live/",
+    "mirrors": [
+      "https://way2movies.live/"
+    ],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Way2Movies](https://beta.way2movies.live/)**, [2](https://way2movies.live/) - Movies / TV / Anime / 4K / [Telegram](https://t.me/Way2MoviesFun) / [Discord](https://discord.gg/mH4zsaAmv7)"
+  },
+  {
+    "title": "Cinecat",
+    "url": "https://cinecat.eu/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Cinecat](https://cinecat.eu/)** - Movies / TV / Anime / Auto-Next / 4K / [Discord](https://discord.gg/mtSMCeTM2z) / [GitHub](https://github.com/xp-technologies-dev/p-stream)"
+  },
+  {
+    "title": "Aether",
+    "url": "https://aether.ist/",
+    "mirrors": [
+      "https://aether.cx/",
+      "https://aether.st/"
+    ],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Aether](https://aether.ist/)**, [2](https://aether.cx/), [3](https://aether.st/) - Movies / TV / Anime / Auto-Next / 4K / [Status](https://rentry.co/aetherdomains) / [Discord](https://discord.gg/MadMF7xb5q)"
+  },
+  {
+    "title": "Atlantic",
+    "url": "https://atlantic.st/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Atlantic](https://atlantic.st/)** - Movies / TV / Anime / Auto-Next / 4K"
+  },
+  {
+    "title": "NEPU",
+    "url": "https://nepu.io/",
+    "mirrors": [
+      "https://nepu.net/",
+      "https://nepu.app/",
+      "https://nepu.is/"
+    ],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[NEPU](https://nepu.io/)**, [2](https://nepu.net/), [3](https://nepu.app/), [4](https://nepu.is/) - Movies / TV / Anime / Auto-Next / 4K / [Status](https://rar.to/) / [Discord](https://discord.gg/nepu)"
+  },
+  {
+    "title": "1Shows",
+    "url": "http://1shows.bz",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[1Shows](http://1shows.bz)**, [1Flex](https://www.1flex.org/) or [1Tube](https://www.1tube.org/) - Movies / TV / Anime / Auto-Next / [Discord](https://discord.gg/the-one) / [4K Note](https://github.com/fmhy/edit/blob/main/docs/.vitepress/notes/1shows-note.md)"
+  },
+  {
+    "title": "VegaMovies",
+    "url": "https://vegamovies.market/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[VegaMovies](https://vegamovies.market/)** - Movies / TV / Anime / 4K / [Telegram](https://telegram.dog/vega_officials)"
+  },
+  {
+    "title": "MKV BASE",
+    "url": "https://mkvbase.site/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[MKV BASE](https://mkvbase.site/)** - Movies / TV / Anime / 4K / Remuxes / 3D / [Telegram](https://t.me/MkVBase)"
+  },
+  {
+    "title": "DDLBase",
+    "url": "https://ddlbase.net/",
+    "mirrors": [
+      "https://ddlbase.com/"
+    ],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[DDLBase](https://ddlbase.net/)**, [2](https://ddlbase.com/) - Movies / TV / 4K / 3D / Remuxes"
+  },
+  {
+    "title": "Scloud",
+    "url": "https://rentry.co/FMHYB64#sc",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[Scloud](https://rentry.co/FMHYB64#sc)** - Movies / TV / 4K / Use Adblocker + [Redirect Bypass](https://www.reddit.com/r/FREEMEDIAHECKYEAH/wiki/internet-tools#wiki_.25B7_redirect_bypass) / [Telegram](https://t.me/scloudmediahub)"
+  },
+  {
+    "title": "⁠XDMovies",
+    "url": "https://top.xdmovies.wtf/",
+    "mirrors": [],
+    "star": "Silver",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 75,
+    "raw": "* ⭐ **[⁠XDMovies](https://top.xdmovies.wtf/)** - Movies / TV / 4K / [Discord](https://discord.com/invite/Py5KKx28Bx)"
+  },
+  {
+    "title": "Willow",
+    "url": "https://willow.arlen.icu/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [Willow](https://willow.arlen.icu/) - Movies / TV / Anime / Auto-Next / [4K Guide](https://rentry.co/willow-guide) / [Telegram](https://t.me/+8OiKICptQwA4YTJk)"
+  },
+  {
+    "title": "FlyStream",
+    "url": "https://flystream.net/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [FlyStream](https://flystream.net/) - Movies / TV / Anime / Auto-Next / 4K / [Discord](https://discord.gg/flystream)"
+  },
+  {
+    "title": "Cineapse",
+    "url": "https://www.cineapse.net/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [Cineapse](https://www.cineapse.net/) - Movies / TV / Anime / Auto-Next / 4K"
+  },
+  {
+    "title": "Basement",
+    "url": "https://basementx.lol/",
+    "mirrors": [
+      "https://basementx.pro/"
+    ],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [Basement](https://basementx.lol/), [2](https://basementx.pro/) - Movies / TV / Anime / Auto-Next / 4K / [Discord](https://discord.com/invite/bWYUqEg7Xq) / [GitHub](https://github.com/xp-technologies-dev/p-stream)"
+  },
+  {
+    "title": "⁠P-Stream Fork",
+    "url": "https://pstream.cfd/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [⁠P-Stream Fork](https://pstream.cfd/) - Movies / TV / Anime / Auto-Next / 4K / [Docs](https://docs.pstream.cfd/) / [Status](https://rentry.co/peestream) / [Discord](https://discord.com/invite/Yd3HG2N4Pv) / [Telegram](https://t.me/peestream) / [Source Code](https://codeberg.org/pee)"
+  },
+  {
+    "title": "ShowBox",
+    "url": "https://www.showbox.media/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [ShowBox](https://www.showbox.media/) - Movies / TV / Anime / 4K / Use [Throwaway Gmail](https://www.reddit.com/r/FREEMEDIAHECKYEAH/wiki/internet-tools/#wiki_.25B7_temp_mail)"
+  },
+  {
+    "title": "OlaMovies",
+    "url": "https://olamovies.dad/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [OlaMovies](https://olamovies.dad/) - Movies / TV / 4K / Requires Google Account / Use [Adblock](https://www.reddit.com/r/FREEMEDIAHECKYEAH/wiki/adblock-vpn-privacy/#wiki_.25BA_adblocking) / [Requests](https://space.olamovies.dad/)"
+  },
+  {
+    "title": "PSArips",
+    "url": "https://psa.wf/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [PSArips](https://psa.wf/) - Movies / TV / 4K"
+  },
+  {
+    "title": "Pahe",
+    "url": "https://pahe.ink/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [Pahe](https://pahe.ink/) - Movies / TV / Anime / 4K / [Warning](https://github.com/fmhy/edit/blob/main/docs/.vitepress/notes/pahe-note.md) / [Discord](https://discord.gg/4AvaCsd2J4)"
+  },
+  {
+    "title": "UHDMovies",
+    "url": "https://modlist.in/?type=uhdmovies",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [UHDMovies](https://modlist.in/?type=uhdmovies) - Movies / 4K"
+  },
+  {
+    "title": "⁠4KHDHub",
+    "url": "https://4khdhub.one/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [⁠4KHDHub](https://4khdhub.one/) - Movies / TV / 4K"
+  },
+  {
+    "title": "FilmFans",
+    "url": "https://filmfans.org/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [FilmFans](https://filmfans.org/) - Movies / 4K"
+  },
+  {
+    "title": "TPB Movies",
+    "url": "https://thepiratebay.org/search.php?q=top100:200",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [TPB Movies](https://thepiratebay.org/search.php?q=top100:200) - Movies / TV / 4K / **Avoid Software / Games**"
+  },
+  {
+    "title": "Youplex Torrents",
+    "url": "https://torrents.youplex.site/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [Youplex Torrents](https://torrents.youplex.site/) - Movies / TV / Anime / 4K"
+  },
+  {
+    "title": "YTS",
+    "url": "https://yts.gg/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": true,
+    "is_1080p": true,
+    "score": 25,
+    "raw": "* [YTS](https://yts.gg/) or [YifyMovies](https://yifymovies.xyz/) - Movies / 4K / [Proxies](https://ytsproxies.com/) / [Status](https://yifystatus.com/) / [Discord](https://discord.gg/GwDraJjMga) / [Note](https://github.com/fmhy/edit/blob/main/docs/.vitepress/notes/yts-yify-note.md)"
+  },
+  {
+    "title": "TodayTVSeries",
+    "url": "https://www.todaytvseries1.com/",
+    "mirrors": [],
+    "star": "None",
+    "is_4k": false,
+    "is_1080p": true,
+    "score": 5,
+    "raw": "* [TodayTVSeries](https://www.todaytvseries1.com/) - TV / 1080p"
+  }
+]
