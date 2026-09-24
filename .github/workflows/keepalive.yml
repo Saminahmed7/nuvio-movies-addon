@@ -1,0 +1,40 @@
+name: keepalive
+
+# Pings both Movies and Anime addons every 5 minutes so Vercel instances stay permanently warm.
+# Zero dependency on repository secrets.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping Movies Addon
+        run: |
+          echo "Pinging Movies Addon..."
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://nuvio-movies-addon.vercel.app/ping")
+            echo "Movies attempt $i -> HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "Movies addon is warm!"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Ping Anime Addon
+        run: |
+          echo "Pinging Anime Addon..."
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://nuvio-anime-1080p-samin13.vercel.app/ping")
+            echo "Anime attempt $i -> HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "Anime addon is warm!"
+              break
+            fi
+            sleep 5
+          done
