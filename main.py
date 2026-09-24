@@ -159,7 +159,7 @@ MANIFEST = {
     "types": ["movie", "series"],
     "idPrefixes": ["tt", "tmdb"],
     "catalogs": CATALOGS,
-    "behaviorHints": {"p2pNotSupported": True, "configurable": True},
+    "behaviorHints": {"p2pNotSupported": True, "configurable": False},
 }
 
 _cache: dict[str, tuple[float, object]] = {}
@@ -227,10 +227,12 @@ def is_quality_ge_1080(quality: str | None, height: int | None = None) -> bool:
 async def index(request: Request):
     base = str(request.base_url).rstrip("/")
     manifest_url = f"{base}/manifest.json"
+    stremio_install = manifest_url.replace("https://", "stremio://").replace("http://", "stremio://")
     return f"""<html><body style="font-family:sans-serif;max-width:640px;margin:40px auto;line-height:1.6">
 <h2>{ADDON_NAME} v{VERSION}</h2>
 <p>Direct HTTP streams for Movies & TV Series. <b>>= 1080p only</b> (1080p, 1440p, 4K). No logins, no cookies, no torrents.</p>
-<p><b>Manifest URL (install in Nuvio/Stremio):</b></p>
+<p><a href="{stremio_install}" style="display:inline-block;padding:12px 24px;background:#6a38b3;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px">👉 Click to Install in Stremio</a></p>
+<p><b>Manifest URL (manual install in Stremio/Nuvio):</b></p>
 <pre style="background:#f4f4f4;padding:10px;border-radius:4px"><code>{manifest_url}</code></pre>
 <p>Test Movie: <code><a href="{base}/stream/movie/tt0137523.json">{base}/stream/movie/tt0137523.json</a></code></p>
 <p>Test Series: <code><a href="{base}/stream/series/tt0903747:1:1.json">{base}/stream/series/tt0903747:1:1.json</a></code></p>
