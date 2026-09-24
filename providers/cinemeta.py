@@ -51,9 +51,17 @@ async def get_meta(client: httpx.AsyncClient, base_id: str, content_type: str = 
                         if m:
                             year = int(m.group(1))
                     
+                    tmdb_id = meta.get("moviedb_id")
+                    if not tmdb_id and base_id.startswith("tmdb:"):
+                        try:
+                            tmdb_id = int(base_id.split(":")[1])
+                        except Exception:
+                            pass
+
                     res = {
                         "base_id": base_id,
                         "imdb_id": meta.get("imdb_id") or (base_id if base_id.startswith("tt") else None),
+                        "tmdb_id": tmdb_id,
                         "title": clean_title(name),
                         "year": year,
                         "type": meta.get("type", ctype),

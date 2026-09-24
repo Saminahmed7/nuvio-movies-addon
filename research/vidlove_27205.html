@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en" style="background:#08090B">
+  <head>
+    <meta charSet="utf-8" />
+    <title>Movie &amp; TV embed player — embed any title by TMDB id | vidlove</title>
+    <meta name="title" content="Movie &amp; TV embed player — embed any title by TMDB id | vidlove" />
+    <meta name="robots" content="index,follow" />
+    <meta name="description" content="Embed a movie or TV episode with one line of HTML. Give the iframe a TMDB id and it plays — subtitles, casting and your own colours. No SDK, no API key." />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0b0c10" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"vidlove","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","url":"https://vidlove.cc","description":"An embeddable movie and TV player. One iframe and a TMDB id, with subtitles, casting and configurable colours.","featureList":["Embed by TMDB id","Movies and TV episodes","Subtitles with viewer styling","Chromecast and picture-in-picture","Resume where the viewer left off","Configurable colours, icons and logo"],"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What do I need to embed a title?","acceptedAnswer":{"@type":"Answer","text":"Its TMDB id. That is all — there is no key, no SDK and no build step."}},{"@type":"Question","name":"How do I embed a movie?","acceptedAnswer":{"@type":"Answer","text":"Point an iframe at /embed/movie/ followed by the TMDB id, for example https://player.vidlove.cc/embed/movie/155."}},{"@type":"Question","name":"How do I embed a TV episode?","acceptedAnswer":{"@type":"Answer","text":"Use /embed/tv/ followed by the TMDB id, the season and the episode, for example https://player.vidlove.cc/embed/tv/1396/1/1."}},{"@type":"Question","name":"Does it work on phones?","acceptedAnswer":{"@type":"Answer","text":"Yes. The controls are built for touch as well as for a keyboard, and the player goes full screen on a phone."}}]}]}</script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4d6d' d='M12 21s-7.5-4.9-10-9.3C.4 8.4 1.9 4.5 5.4 4.5c2 0 3.4 1.1 4.6 2.6h4c1.2-1.5 2.6-2.6 4.6-2.6 3.5 0 5 3.9 3.4 7.2C19.5 16.1 12 21 12 21z'/%3E%3C/svg%3E" />
+    <link rel="canonical" href="https://vidlove.cc" />
+    <meta itemProp="name" content="vidlove" />
+    <meta itemProp="description" content="Embed a movie or TV episode with one line of HTML. Give the iframe a TMDB id and it plays — subtitles, casting and your own colours. No SDK, no API key." />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Movie &amp; TV embed player — embed any title by TMDB id | vidlove" />
+    <meta property="og:description" content="Embed a movie or TV episode with one line of HTML. Give the iframe a TMDB id and it plays — subtitles, casting and your own colours. No SDK, no API key." />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://vidlove.cc" />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://vidlove.cc" />
+    <meta property="twitter:title" content="Movie &amp; TV embed player — embed any title by TMDB id | vidlove" />
+    <meta property="twitter:description" content="Embed a movie or TV episode with one line of HTML. Give the iframe a TMDB id and it plays — subtitles, casting and your own colours. No SDK, no API key." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    
+    <script>
+      (function () {
+        try {
+          var API = 'https://api.vidlove.cc';
+          ['api', 'a2', 'b', 'b2', 'c', 'c2'].forEach(function (h) {
+            var l = document.createElement('link');
+            l.rel = 'preconnect'; l.href = 'https://' + h + '.whysosigmabro.cfd'; l.crossOrigin = 'anonymous';
+            document.head.appendChild(l);
+          });
+          var q = new URLSearchParams(location.search);
+          if (q.get('server')) return;                       // pinned server: lead unknown, skip
+          var seg = location.pathname.split('/');
+          if (seg[1] !== 'embed') return;
+          var kind = seg[2], id = seg[3];
+          if (!id || id.indexOf('tt') === 0) return;          // imdb id: player converts first
+          var isTv = kind === 'tv' || (kind === 'movie' && q.get('ss') && q.get('ep'));
+          var season = kind === 'tv' ? seg[4] : q.get('ss');
+          var episode = kind === 'tv' ? seg[5] : q.get('ep');
+          if (kind !== 'tv' && kind !== 'movie') return;
+          if (isTv && (!season || !episode)) return;
+          var base = isTv
+            ? API + '/tv?id=' + id + '&season=' + season + '&episode=' + episode + '&mode=json&sources=moviebox2'
+            : API + '/movie?id=' + id + '&mode=json&sources=moviebox2';
+          var sync = false;
+          try {
+            var v = document.createElement('video');
+            sync = v.canPlayType('video/mp4; codecs="hvc1.1.6.L93.90"') === 'probably'
+                || v.canPlayType('video/mp4; codecs="hev1.1.6.L93.90"') === 'probably';
+          } catch (e) { /* keep false */ }
+          var verdict = sync;
+          var probe = (function () {
+            try {
+              var mc = navigator.mediaCapabilities;
+              if (!mc || !mc.decodingInfo) return Promise.resolve();
+              var codecs = ['hvc1.1.6.L120.90', 'hvc1.1.6.L93.90'];
+              var chain = Promise.resolve();
+              codecs.forEach(function (c) {
+                chain = chain.then(function () {
+                  if (verdict) return;
+                  return mc.decodingInfo({
+                    type: 'file',
+                    video: { contentType: 'video/mp4; codecs="' + c + '"', width: 1920, height: 1080, bitrate: 4000000, framerate: 24 },
+                  }).then(function (info) { if (info && info.supported && info.powerEfficient) verdict = true; }, function () {});
+                });
+              });
+              return chain;
+            } catch (e) { return Promise.resolve(); }
+          })();
+          var capped = Promise.race([probe, new Promise(function (r) { setTimeout(r, 400); })]);
+          window.__preResolve = capped.then(function () {
+            var hv = verdict ? '&hevc=1' : '';
+            var fire = function (u) {
+              return fetch(u, { headers: { Accept: 'application/json' }, mode: 'cors', credentials: 'omit' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .catch(function () { return null; });
+            };
+            var t = Date.now();
+            var mbUrl = base + hv;
+            var mkUrl = base.replace('&sources=moviebox2', '&sources=megaknight') + hv;
+            var mb = { url: mbUrl, promise: fire(mbUrl), t: t };
+            if (mkUrl === mbUrl) return mb;
+            var mkP = fire(mkUrl);
+            var mk = { url: mkUrl, t: t };
+            Object.defineProperty(mk, 'promise', { get: function () { window.__preResolve = Promise.resolve(mb); return mkP; } });
+            return mk;
+          });
+        } catch (e) { /* never break the page */ }
+      })();
+    </script>
+
+      <style>html,body{background:#08090B;margin:0}</style>
+    <script type="module" crossorigin src="/assets/index-BzRddvSt.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/c-CV-sZ8iy.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-DRKqkMc3.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-B35d4d7g.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-qOI_FzBI.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-BQhJJJlR.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-BeLtu-UY.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-CwBg4Wrv.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-D9VydeRt.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-BgCBGZma.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-BNuYMg18.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-yKlX4wKp.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-Cz8OyQks.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-8kqQFx-4.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-DYfYSV-e.js">
+    <link rel="modulepreload" crossorigin href="/assets/c-CZNTu5MX.js">
+    <link rel="stylesheet" crossorigin href="/assets/s-jhECmvqU.css">
+    <style>html.vl-embed #vl-pre{display:none!important}</style>
+    <script>if(location.pathname.indexOf("/embed/")===0){document.documentElement.className+=" vl-embed";var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}</script>
+  </head>
+  <body style="margin:0;background:#08090B">
+    <div id="root">
+    <div id="vl-pre" style="max-width:820px;margin:0 auto;padding:56px 24px 80px;color:#c9ccd4;font:16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+      <p style="font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#7d838f;margin:0 0 18px">vidlove</p>
+      <h1 style="font-size:40px;line-height:1.1;letter-spacing:-.02em;color:#f3f4f6;margin:0 0 16px">Movie and TV embed player for your website</h1>
+      <p style="font-size:19px;color:#aeb3bd;margin:0 0 28px">Embed a film or a TV episode with one line of HTML. Give the iframe a TMDB id and it plays. There is no SDK, no API key and no build step.</p>
+
+      <h2 style="font-size:20px;color:#f3f4f6;margin:32px 0 10px">Embed a movie</h2>
+      <p>Point an iframe at <code>/embed/movie/</code> and the film&rsquo;s TMDB id.</p>
+      <pre style="overflow:auto;background:#101216;border:1px solid #1e2127;border-radius:8px;padding:12px 14px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d7dae1"><code>&lt;iframe src="https://player.vidlove.cc/embed/movie/155" allowfullscreen&gt;&lt;/iframe&gt;</code></pre>
+
+      <h2 style="font-size:20px;color:#f3f4f6;margin:32px 0 10px">Embed a TV episode</h2>
+      <p>Episodes add the season and the episode number.</p>
+      <pre style="overflow:auto;background:#101216;border:1px solid #1e2127;border-radius:8px;padding:12px 14px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d7dae1"><code>&lt;iframe src="https://player.vidlove.cc/embed/tv/1396/1/1" allowfullscreen&gt;&lt;/iframe&gt;</code></pre>
+
+      <h2 style="font-size:20px;color:#f3f4f6;margin:32px 0 10px">What your viewers get</h2>
+      <ul style="margin:0;padding-left:20px">
+        <li>It plays the moment they press play, and opens at the same scene next time.</li>
+        <li>Subtitles they can restyle: font, size, colour and background.</li>
+        <li>Chromecast to the television, picture-in-picture on the laptop.</li>
+        <li>If one server cannot play a title the next one does, and your link never changes.</li>
+        <li>Controls built for thumbs as well as for a keyboard.</li>
+      </ul>
+
+      <h2 style="font-size:20px;color:#f3f4f6;margin:32px 0 10px">What you can change</h2>
+      <p>Colours, control icons, your own logo, autoplay, the starting quality, subtitle styling and the player skin are all options on the same URL. Nothing is configured anywhere else.</p>
+
+      <h2 style="font-size:20px;color:#f3f4f6;margin:32px 0 10px">Questions</h2>
+      <p><strong style="color:#e6e8ec">What do I need to embed a title?</strong><br />Its TMDB id. That is all.</p>
+      <p><strong style="color:#e6e8ec">Which ids does it take?</strong><br />TMDB ids, for both films and TV.</p>
+      <p><strong style="color:#e6e8ec">Does it work on phones?</strong><br />Yes, and it goes full screen there too.</p>
+
+      <p style="margin-top:36px;color:#7d838f">Loading the full page&hellip; <a href="https://vidlove.cc" style="color:#c9ccd4">vidlove.cc</a></p>
+    </div>
+    </div>
+    <script>
+      (function () {
+        // This block is the page as plain HTML, for anything that reads the site without running
+        // JavaScript -- a crawler, a link preview, an answer engine. React replaces it the moment
+        // it mounts, so a visitor sees it only as the first paint rather than a blank screen.
+        // An embed is not a page and must never show it, so on an embed route it is removed here,
+        // synchronously, while the parser is still blocked -- before anything is painted.
+        if (location.pathname.indexOf('/embed/') === 0) {
+          var pre = document.getElementById('vl-pre');
+          if (pre && pre.parentNode) pre.parentNode.removeChild(pre);
+          var rb = document.querySelector('meta[name="robots"]');
+          if (rb) rb.setAttribute('content', 'noindex,follow');
+        }
+      })();
+    </script>
+
+    <script src="/rt.js"></script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"54cce6874c0c4caa9b38bf7a0e7409b9","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

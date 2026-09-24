@@ -120,10 +120,24 @@ async def health():
     }
 
 
+from providers import vidlove
+
+
 @app.get("/diag")
 async def diag(q: str = "Inception"):
     """Check upstream reachability and provider status."""
-    return {"query": q, "providers": {}}
+    results = {}
+    try:
+        vidlove_streams = await vidlove.resolve(27205, "movie", 1, 1, "Inception", 2010)
+        results["vidlove"] = {
+            "status": "ok",
+            "streams_count": len(vidlove_streams),
+            "sample": vidlove_streams[0]["name"] if vidlove_streams else None,
+            "sample_title": vidlove_streams[0]["title"] if vidlove_streams else None
+        }
+    except Exception as e:
+        results["vidlove"] = {"status": "error", "error": str(e)}
+    return {"query": q, "providers": results}
 
 
 @app.get("/stream/{ctype}/{full_id}.json")
@@ -146,12 +160,27 @@ async def stream(ctype: str, full_id: str):
 
     title = meta["title"]
     year = meta.get("year")
-    imdb_id = meta.get("imdb_id")
+    tmdb_id = meta.get("tmdb_id")
 
-    # Provider queries will be gathered concurrently within STREAM_DEADLINE_S
     streams = []
+    if tmdb_id:
+        try:
+            prov_streams = await asyncio.wait_for(
+                vidlove.resolve(
+                    tmdb_id=tmdb_id,
+                    ctype=ctype,
+                    season=season,
+                    episode=episode,
+                    title=title,
+                    year=year
+                ),
+                timeout=STREAM_DEADLINE_S
+            )
+            streams.extend(prov_streams)
+        except Exception as e:
+            print(f"[Stream] Error querying providers: {e}")
 
-    # Filter out anything below 1080p
+    # Enforce strictly >= 1080p
     valid_streams = []
     for s in streams:
         q = s.get("quality", "1080p")
