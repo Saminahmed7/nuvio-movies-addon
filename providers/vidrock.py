@@ -75,7 +75,8 @@ def decrypt_vidrock(enc_str: str) -> str | None:
         return None
 
 
-def parse_variants(manifest: str, ctype: str = "movie") -> list[dict]:
+def parse_variants(manifest: str, ctype: str = "movie", base_url: str = "") -> list[dict]:
+    from urllib.parse import urljoin
     variants = []
     lines = [line.strip() for line in manifest.splitlines() if line.strip()]
     for i, line in enumerate(lines):
@@ -89,6 +90,8 @@ def parse_variants(manifest: str, ctype: str = "movie") -> list[dict]:
 
             if i + 1 < len(lines):
                 var_url = lines[i + 1]
+                if base_url and not var_url.startswith(("http://", "https://")):
+                    var_url = urljoin(base_url, var_url)
                 if is_ge_1080(width, height):
                     q_label = "4K" if width >= 3840 or height >= 2160 else "1440p" if width >= 2560 or height >= 1440 else "1080p"
                     variants.append({
@@ -156,7 +159,7 @@ async def resolve(
                 if not manifest:
                     continue
 
-                variants = parse_variants(manifest, ctype=ctype)
+                variants = parse_variants(manifest, ctype=ctype, base_url=decrypted_url)
                 if not variants:
                     continue
 
