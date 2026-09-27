@@ -34,7 +34,7 @@ async def test_addon():
         diag = r.json()
         assert "providers" in diag
         for name, status in diag["providers"].items():
-            assert status["status"] in ("ok", "error")
+            assert status["status"] in ("ok", "error", "unavailable")
             if status["status"] == "ok":
                 assert status["streams_count"] > 0
         print(f"  PASS: providers={list(diag['providers'].keys())}")

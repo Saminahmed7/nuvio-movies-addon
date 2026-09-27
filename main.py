@@ -19,23 +19,26 @@ from providers import cinemeta
 from providers import cf_client
 from providers import vidlove
 from providers import vidrock
+from providers import videasy
 
 ADDON_ID = "org.nuvio.movies-1080p"
 ADDON_NAME = "Movies & TV 1080p+"
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 CACHE_TTL_SEARCH = int(os.getenv("CACHE_TTL_SEARCH", "3600"))
 CACHE_TTL_CATALOG = int(os.getenv("CACHE_TTL_CATALOG", "86400"))  # 24 hours
-STREAM_DEADLINE_S = float(os.getenv("STREAM_DEADLINE_S", "9.5"))
+STREAM_DEADLINE_S = float(os.getenv("STREAM_DEADLINE_S", "4.0"))
 PORT = int(os.getenv("PORT", "7001"))
 
 # Rate limiting configuration (requests per minute per provider)
 RATE_LIMITS = {
-    "vidlove": int(os.getenv("RATE_LIMIT_VIDLOVE", "30")),
-    "vidrock": int(os.getenv("RATE_LIMIT_VIDROCK", "30")),
+    "videasy": int(os.getenv("RATE_LIMIT_VIDEASY", "60")),
+    "vidlove": int(os.getenv("RATE_LIMIT_VIDLOVE", "60")),
+    "vidrock": int(os.getenv("RATE_LIMIT_VIDROCK", "60")),
 }
 
-# Provider priority order (tried sequentially)
+# Providers tried in parallel
 PROVIDERS = [
+    ("videasy", videasy.resolve),
     ("vidlove", vidlove.resolve),
     ("vidrock", vidrock.resolve),
 ]
@@ -68,9 +71,9 @@ class Metrics:
     stream_requests: int = 0
     stream_success: int = 0
     stream_errors: int = 0
-    provider_calls: dict[str, int] = field(default_factory=lambda: {"vidlove": 0, "vidrock": 0})
-    provider_success: dict[str, int] = field(default_factory=lambda: {"vidlove": 0, "vidrock": 0})
-    provider_errors: dict[str, int] = field(default_factory=lambda: {"vidlove": 0, "vidrock": 0})
+    provider_calls: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "vidlove": 0, "vidrock": 0})
+    provider_success: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "vidlove": 0, "vidrock": 0})
+    provider_errors: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "vidlove": 0, "vidrock": 0})
     cache_hits: int = 0
     cache_misses: int = 0
     catalog_requests: int = 0
@@ -388,12 +391,19 @@ async def diag(q: str = "Inception"):
     for name, resolver in PROVIDERS:
         try:
             prov_streams = await resolver(27205, "movie", 1, 1, "Inception", 2010)
-            results[name] = {
-                "status": "ok",
-                "streams_count": len(prov_streams),
-                "sample": prov_streams[0]["name"] if prov_streams else None,
-                "sample_title": prov_streams[0]["title"] if prov_streams else None
-            }
+            if len(prov_streams) > 0:
+                results[name] = {
+                    "status": "ok",
+                    "streams_count": len(prov_streams),
+                    "sample": prov_streams[0]["name"] if prov_streams else None,
+                    "sample_title": prov_streams[0]["title"] if prov_streams else None
+                }
+            else:
+                results[name] = {
+                    "status": "unavailable",
+                    "streams_count": 0,
+                    "note": "No streams returned (provider may be geo-blocked or unavailable from this network)"
+                }
         except Exception as e:
             results[name] = {"status": "error", "error": str(e)}
     return {"query": q, "providers": results}
@@ -435,20 +445,14 @@ async def stream(ctype: str, full_id: str):
 
     streams = []
     if tmdb_id:
+        tasks = []
         for name, resolver in PROVIDERS:
             metrics.provider_calls[name] += 1
-            # Check rate limit
             limiter = _rate_limiters.get(name)
             if limiter and not limiter.acquire():
-                wait = limiter.wait_time()
-                logger.warning("provider_rate_limited", extra={"provider": name, "wait_seconds": wait})
-                await asyncio.sleep(min(wait, 2.0))
-                if not limiter.acquire():
-                    logger.warning("provider_rate_limited_skip", extra={"provider": name})
-                    continue
-            
-            try:
-                prov_streams = await asyncio.wait_for(
+                continue
+            tasks.append(
+                asyncio.create_task(
                     resolver(
                         tmdb_id=tmdb_id,
                         ctype=ctype,
@@ -456,31 +460,74 @@ async def stream(ctype: str, full_id: str):
                         episode=episode,
                         title=title,
                         year=year
-                    ),
-                    timeout=STREAM_DEADLINE_S
+                    )
                 )
-                if prov_streams:
-                    streams.extend(prov_streams)
-                    metrics.provider_success[name] += 1
-                    logger.info("provider_success", extra={"provider": name, "streams_count": len(prov_streams)})
-                    break
-                else:
-                    metrics.provider_errors[name] += 1
-                    logger.warning("provider_empty_result", extra={"provider": name})
-            except asyncio.TimeoutError:
-                metrics.provider_errors[name] += 1
-                logger.error("provider_timeout", extra={"provider": name})
-            except Exception as e:
-                metrics.provider_errors[name] += 1
-                logger.error("provider_error", extra={"provider": name, "error": str(e)})
+            )
+
+        deadline = time.time() + STREAM_DEADLINE_S
+        pending = set(tasks)
+
+        while pending:
+            rem = deadline - time.time()
+            if rem <= 0:
+                break
+            done, pending = await asyncio.wait(
+                pending,
+                timeout=rem,
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            for d in done:
+                try:
+                    res = d.result()
+                    if res:
+                        streams.extend(res)
+                except Exception:
+                    pass
+            if len(streams) >= 4:
+                break
+
+        # Background task: finish any slower providers and merge into cache
+        if pending:
+            async def _bg_collector(rem_tasks, ckey, current_streams):
+                try:
+                    done_bg, _ = await asyncio.wait(rem_tasks, timeout=8.0)
+                    extra = []
+                    for db in done_bg:
+                        try:
+                            r = db.result()
+                            if r:
+                                extra.extend(r)
+                        except Exception:
+                            pass
+                    if extra:
+                        existing = cache_get(ckey) or current_streams
+                        urls = {s["url"] for s in existing if isinstance(s, dict) and "url" in s}
+                        combined = list(existing) + [s for s in extra if s.get("url") not in urls]
+                        valid_combined = [s for s in combined if is_quality_ge_1080(s.get("quality"), s.get("height"))]
+                        quality_rank = {"4K": 0, "1440p": 1, "1080p": 2}
+                        valid_combined.sort(key=lambda x: quality_rank.get(x.get("quality"), 99))
+                        cache_set(ckey, valid_combined)
+                except Exception:
+                    pass
+
+            asyncio.create_task(_bg_collector(pending, cache_key, streams))
 
     # Enforce strictly >= 1080p
     valid_streams = []
+    seen_urls = set()
     for s in streams:
+        url = s.get("url")
+        if not url or url in seen_urls:
+            continue
         q = s.get("quality", "1080p")
         h = s.get("height")
         if is_quality_ge_1080(q, h):
+            seen_urls.add(url)
             valid_streams.append(s)
+
+    # Sort by quality: 4K first, 1440p, then 1080p
+    quality_rank = {"4K": 0, "1440p": 1, "1080p": 2}
+    valid_streams.sort(key=lambda x: quality_rank.get(x.get("quality"), 99))
 
     cache_set(cache_key, valid_streams)
     

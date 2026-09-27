@@ -8,6 +8,7 @@ Features:
 """
 import base64
 import re
+from urllib.parse import urljoin
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import httpx
 
@@ -76,7 +77,7 @@ def decrypt_vidrock(enc_str: str) -> str | None:
 
 
 def parse_variants(manifest: str, ctype: str = "movie", base_url: str = "") -> list[dict]:
-    from urllib.parse import urljoin
+    """Parse #EXT-X-STREAM-INF variants from HLS master manifest."""
     variants = []
     lines = [line.strip() for line in manifest.splitlines() if line.strip()]
     for i, line in enumerate(lines):
@@ -105,11 +106,21 @@ def parse_variants(manifest: str, ctype: str = "movie", base_url: str = "") -> l
     return variants
 
 
+def is_master_playlist(manifest: str) -> bool:
+    """Check if manifest is a master playlist (has #EXT-X-STREAM-INF)"""
+    return "#EXT-X-STREAM-INF" in manifest
+
+
+def is_media_playlist(manifest: str) -> bool:
+    """Check if manifest is a media playlist (has #EXTINF)"""
+    return "#EXTINF" in manifest
+
+
 async def _fetch_manifest(client: httpx.AsyncClient, m3u8_url: str) -> str | None:
     """Fetch HLS master manifest with proper headers."""
     try:
         r = await client.get(m3u8_url, headers={"User-Agent": UA, "Referer": "https://vidrock.net/"}, timeout=TIMEOUT, follow_redirects=True)
-        if r.status_code == 200 and "#EXTM3U" in r.text:
+        if r.status_code == 200 and ("#EXTM3U" in r.text):
             return r.text
     except Exception:
         pass
@@ -154,12 +165,40 @@ async def resolve(
                 if not decrypted_url:
                     continue
 
-                # Fetch and parse master manifest
+                # Fetch and parse manifest
                 manifest = await _fetch_manifest(client, decrypted_url)
                 if not manifest:
                     continue
 
-                variants = parse_variants(manifest, ctype=ctype, base_url=decrypted_url)
+                variants = []
+                if is_master_playlist(manifest):
+                    # Standard master playlist with variants
+                    variants = parse_variants(manifest, ctype=ctype, base_url=decrypted_url)
+                elif is_media_playlist(manifest):
+                    # Direct media playlist - treat as single variant
+                    # Extract bandwidth from #EXT-X-TARGETDURATION or estimate
+                    bandwidth = 5000000  # 5 Mbps default
+                    # Try to get resolution from #EXT-X-STREAM-INF if present in media playlist
+                    res_match = re.search(r"RESOLUTION=(\d+)x(\d+)", manifest)
+                    if res_match:
+                        width = int(res_match.group(1))
+                        height = int(res_match.group(2))
+                    else:
+                        # Default to 1080p
+                        width, height = 1920, 1080
+                    
+                    if is_ge_1080(width, height):
+                        variants.append({
+                            "quality": "1080p",
+                            "width": width,
+                            "height": height,
+                            "bandwidth": bandwidth,
+                            "url": decrypted_url,
+                            "size_bytes": estimate_size(bandwidth, ctype)
+                        })
+                else:
+                    continue
+
                 if not variants:
                     continue
 
