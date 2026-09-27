@@ -184,24 +184,45 @@ async def resolve(
         if not links:
             return []
 
-        # For now, just return the file host links
-        # TODO: Add file host extractors (GDFlix, HubCloud, etc.)
+        # Extract actual streams from file host links
+        from providers import filehosts
         for link in links:
-            streams.append({
-                "name": f"[{link['host']}] Bollyflix",
-                "title": f"{title} ({year})" if year else title,
-                "url": link["url"],
-                "quality": "1080p",
-                "size": 0,
-                "behaviorHints": {
-                    "notWebReady": False,
-                    "proxyHeaders": {
-                        "request": {
-                            "User-Agent": UA,
-                            "Referer": content_url,
+            try:
+                host_streams = await filehosts.extract_stream(link["url"], client)
+                for s in host_streams:
+                    s["name"] = f"[{s['quality']}] Bollyflix {link['host']}"
+                    s["title"] = f"{title} ({year})" if year else title
+                    s["behaviorHints"] = {
+                        "notWebReady": False,
+                        "proxyHeaders": {
+                            "request": {
+                                "User-Agent": UA,
+                                "Referer": content_url,
+                            }
                         }
                     }
-                }
-            })
+                    streams.append(s)
+            except Exception as e:
+                print(f"[Bollyflix] Error extracting {link['host']}: {e}")
+
+        # If no streams extracted, fall back to returning the links
+        if not streams:
+            for link in links:
+                streams.append({
+                    "name": f"[{link['host']}] Bollyflix",
+                    "title": f"{title} ({year})" if year else title,
+                    "url": link["url"],
+                    "quality": "1080p",
+                    "size": 0,
+                    "behaviorHints": {
+                        "notWebReady": False,
+                        "proxyHeaders": {
+                            "request": {
+                                "User-Agent": UA,
+                                "Referer": content_url,
+                            }
+                        }
+                    }
+                })
 
     return streams
