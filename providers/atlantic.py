@@ -4,6 +4,7 @@ Features:
 - Direct HLS Streams via stellar.hls.lol resolver
 - Supports Movies and TV Series
 - 4K, 1440p, 1080p quality
+- Subtitle support via vdrk.site
 """
 import re
 import httpx
@@ -14,9 +15,10 @@ HEADERS = {
     "Referer": "https://atlantic.st/",
     "Origin": "https://atlantic.st"
 }
-TIMEOUT = 8.0
+TIMEOUT = 10.0
 RESOLVER_URL = "https://stellar.hls.lol/resolve"
-CDN_BASE = "https://cdn.hls.lol"
+SUB_BASE_MOVIE = "https://sub.vdrk.site/v1/movie/"
+SUB_BASE_TV = "https://sub.vdrk.site/v1/tv/"
 
 
 def format_size(bytes_val: int | float | None) -> str | None:
@@ -44,6 +46,20 @@ def is_ge_1080(width: int, height: int) -> bool:
     return False
 
 
+def is_valid_stream_url(url: str) -> bool:
+    """Filter out invalid stream URLs (YouTube, etc.)"""
+    if not url:
+        return False
+    blocked_domains = [
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "youtube-nocookie.com",
+    ]
+    url_lower = url.lower()
+    return not any(domain in url_lower for domain in blocked_domains)
+
+
 def parse_variants(manifest: str, ctype: str = "movie") -> list[dict]:
     variants = []
     lines = [line.strip() for line in manifest.splitlines() if line.strip()]
@@ -58,7 +74,7 @@ def parse_variants(manifest: str, ctype: str = "movie") -> list[dict]:
 
             if i + 1 < len(lines):
                 var_url = lines[i + 1]
-                if is_ge_1080(width, height):
+                if is_ge_1080(width, height) and is_valid_stream_url(var_url):
                     q_label = "4K" if width >= 3840 or height >= 2160 else "1440p" if width >= 2560 or height >= 1440 else "1080p"
                     variants.append({
                         "quality": q_label,
@@ -69,6 +85,32 @@ def parse_variants(manifest: str, ctype: str = "movie") -> list[dict]:
                         "size_bytes": estimate_size(bandwidth, ctype)
                     })
     return variants
+
+
+async def fetch_subtitles(client: httpx.AsyncClient, tmdb_id: str, ctype: str, season: int = 1, episode: int = 1) -> list[dict]:
+    """Fetch subtitles from vdrk.site"""
+    subs = []
+    try:
+        if ctype == "movie":
+            url = f"{SUB_BASE_MOVIE}{tmdb_id}"
+        else:
+            url = f"{SUB_BASE_TV}{tmdb_id}/{season}/{episode}"
+        
+        r = await client.get(url, timeout=5.0)
+        if r.status_code == 200:
+            data = r.json()
+            for s in data:
+                lang = s.get("language", "Unknown")
+                file_url = s.get("url") or s.get("file")
+                if file_url and file_url.endswith(".vtt"):
+                    subs.append({
+                        "id": lang.lower().replace(" ", "_"),
+                        "lang": lang,
+                        "url": file_url
+                    })
+    except Exception:
+        pass
+    return subs
 
 
 async def resolve(
@@ -111,10 +153,8 @@ async def resolve(
 
             manifest = r2.text
 
-            # Extract subtitles from Atlantic (if available)
-            subs = []
-            # Atlantic might provide subtitles in the response or we can fetch separately
-            # For now, we'll skip subtitle extraction for Atlantic
+            # Extract subtitles
+            subs = await fetch_subtitles(client, str(tmdb_id), ctype, season, episode)
 
             variants = parse_variants(manifest, ctype=ctype)
             for v in variants:
