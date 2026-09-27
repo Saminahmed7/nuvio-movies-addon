@@ -23,10 +23,12 @@ from providers import videasy
 from providers import cinejoy
 from providers import xpass
 from providers import bollyflix
+from providers import moviesmod
+from providers import vegamovies
 
 ADDON_ID = "org.nuvio.movies-1080p"
 ADDON_NAME = "Movies & TV 1080p+"
-VERSION = "2.2.0"
+VERSION = "2.3.0"
 CACHE_TTL_SEARCH = int(os.getenv("CACHE_TTL_SEARCH", "3600"))
 CACHE_TTL_CATALOG = int(os.getenv("CACHE_TTL_CATALOG", "86400"))  # 24 hours
 STREAM_DEADLINE_S = float(os.getenv("STREAM_DEADLINE_S", "4.0"))
@@ -40,6 +42,8 @@ RATE_LIMITS = {
     "vidlove": int(os.getenv("RATE_LIMIT_VIDLOVE", "60")),
     "vidrock": int(os.getenv("RATE_LIMIT_VIDROCK", "60")),
     "bollyflix": int(os.getenv("RATE_LIMIT_BOLLYFLIX", "60")),
+    "moviesmod": int(os.getenv("RATE_LIMIT_MOVIESMOD", "60")),
+    "vegamovies": int(os.getenv("RATE_LIMIT_VEGAMOVIES", "60")),
 }
 
 # Providers tried in parallel
@@ -50,6 +54,8 @@ PROVIDERS = [
     ("vidlove", vidlove.resolve),
     ("vidrock", vidrock.resolve),
     ("bollyflix", bollyflix.resolve),
+    ("moviesmod", moviesmod.resolve),
+    ("vegamovies", vegamovies.resolve),
 ]
 
 # Structured logging setup
@@ -80,9 +86,9 @@ class Metrics:
     stream_requests: int = 0
     stream_success: int = 0
     stream_errors: int = 0
-    provider_calls: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0})
-    provider_success: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0})
-    provider_errors: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0})
+    provider_calls: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0, "moviesmod": 0, "vegamovies": 0})
+    provider_success: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0, "moviesmod": 0, "vegamovies": 0})
+    provider_errors: dict[str, int] = field(default_factory=lambda: {"videasy": 0, "cinejoy": 0, "xpass": 0, "vidlove": 0, "vidrock": 0, "bollyflix": 0, "moviesmod": 0, "vegamovies": 0})
     cache_hits: int = 0
     cache_misses: int = 0
     catalog_requests: int = 0
