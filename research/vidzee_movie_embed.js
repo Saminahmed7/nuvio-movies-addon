@@ -1,0 +1,1 @@
+import{b as o,j as s}from"./index-B97m00TC.js";import{E as t,A as m}from"./Ads-BJkRehrQ.js";function n(){const{tmdb:e}=o.useParams();return s.jsxs(s.Fragment,{children:[s.jsx(t,{type:"movie",id:e}),s.jsx(m,{})]})}export{n as component};

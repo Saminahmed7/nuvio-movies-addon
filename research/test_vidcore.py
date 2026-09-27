@@ -1,17 +1,34 @@
-import httpx
+from curl_cffi import requests
 import re
+import json
 
-url = 'https://vidcore.net/movie/27205'
-r = httpx.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10, follow_redirects=True)
-print(f'Status: {r.status_code}')
-print(f'Final URL: {r.url}')
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+    "Referer": "https://vidcore.io/",
+    "X-Requested-With": "XMLHttpRequest"
+}
 
-iframes = re.findall(r'<iframe[^>]+src=["\']([^"\']+)["\']', r.text)
-print(f'iframes: {iframes}')
-
-m3u8 = re.findall(r'https?://[^\s"\'<>]+\.m3u8[^\s"\'<>]*', r.text)
-print(f'm3u8: {m3u8}')
-
-# Also check for API calls in the page
-scripts = re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', r.text)
-print(f'scripts: {scripts[:10]}')
+try:
+    r = requests.get("https://vidcore.io/movie/550/", headers=headers, impersonate="chrome120", timeout=8)
+    print("vidcore status:", r.status_code, len(r.text))
+    match = re.search(r'\"(?:en|token)\":\"(.*?)\"', r.text)
+    if match:
+        text = match.group(1)
+        print("token text found, len:", len(text))
+        enc = requests.get(f"https://enc-dec.app/api/enc-vidcore?text={text}").json()
+        print("enc-vidcore:", enc)
+        parts = enc.get("result")
+        if parts:
+            headers["X-CSRF-Token"] = parts["token"]
+            srv_enc = requests.post(parts["servers"], headers=headers).text
+            srv_dec = requests.post("https://enc-dec.app/api/dec-vidcore", json={"text": srv_enc}).json()
+            print("servers:", srv_dec)
+            for s in srv_dec.get("result", []):
+                stream_url = f"{parts['stream']}/{s['data']}"
+                st_enc = requests.post(stream_url, headers=headers).text
+                st_dec = requests.post("https://enc-dec.app/api/dec-vidcore", json={"text": st_enc}).json()
+                print("stream res for", s.get("name"), ":", st_dec)
+    else:
+        print("no token match. Page sample:", r.text[:400])
+except Exception as e:
+    print("error:", e)
