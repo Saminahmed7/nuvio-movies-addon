@@ -31,7 +31,7 @@ from providers import titan
 
 ADDON_ID = "org.nuvio.movies-1080p"
 ADDON_NAME = "Movies & TV 1080p+"
-VERSION = "2.6.0"
+VERSION = "2.6.1"
 CACHE_TTL_SEARCH = int(os.getenv("CACHE_TTL_SEARCH", "3600"))
 CACHE_TTL_CATALOG = int(os.getenv("CACHE_TTL_CATALOG", "86400"))  # 24 hours
 STREAM_DEADLINE_S = float(os.getenv("STREAM_DEADLINE_S", "7.0"))
